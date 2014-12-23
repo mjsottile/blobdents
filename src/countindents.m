@@ -62,14 +62,6 @@ k = sqrt((ddy.*dx - ddx.*dy).^2) ./ ((dx.^2 + dy.^2).^(3/2));
 % plotting useful during debugging:
 % 
 
-
-figure;
-plot(x,y,'r');
-hold on;
-plot(real(ifft(xs)),real(ifft(ys)),'g');
-set(gca,'XLim',[168 188],'YLim',[74 96]);
-hold off;
-
 figure;
 plot(x,y,'r');
 hold on;
