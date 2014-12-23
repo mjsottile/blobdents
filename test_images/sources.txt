@@ -3,4 +3,4 @@ From http://pythonvision.org/basic-tutorial :
  - dna.jpeg
  - dnaf-otsu.jpeg
 
-
+Flowers from http://commons.wikimedia.org/wiki/Flowers
