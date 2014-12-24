@@ -56,39 +56,73 @@ ddx = real(ifft(xs.*ftddiff'));
 ddy = real(ifft(ys.*ftddiff'));
 
 % approximate curvature:  http://en.wikipedia.org/wiki/Curvature
-k = sqrt((ddy.*dx - ddx.*dy).^2) ./ ((dx.^2 + dy.^2).^(3/2));
+%k = sqrt((ddy.*dx - ddx.*dy).^2) ./ ((dx.^2 + dy.^2).^(3/2));
+k = (ddy.*dx - ddx.*dy) ./ ((dx.^2 + dy.^2).^(3/2));
 
 %
 % plotting useful during debugging:
 % 
 
+% figure;
+% plot(x,y,'r');
+% hold on;
+% plot(real(ifft(xs)),real(ifft(ys)),'g');
+% hold off;
+% 
+% 
+% figure;
+% plot(real(ifft(xs)),real(ifft(ys)),'r');
+% hold on;
+% jmp = 2;
+% quiver(b1(1:jmp:end,2),b1(1:jmp:end,1),dx(1:jmp:end).*100,dy(1:jmp:end).*100);
+% quiver(b1(1:jmp:end,2),b1(1:jmp:end,1),ddx(1:jmp:end).*100,ddy(1:jmp:end).*100,'c');
+% plot(real(ifft(xs)),real(ifft(ys)),'r');
+% hold off;
+
+
 figure;
-plot(x,y,'r');
+
+filt_xs = real(ifft(xs));
+filt_ys = real(ifft(ys));
+
+sk = sign(k);
+pos = find(sk==1);
+neg = find(sk==-1);
+plot(filt_xs(pos),filt_ys(pos),'b.');
 hold on;
-plot(real(ifft(xs)),real(ifft(ys)),'g');
+plot(filt_xs(neg),filt_ys(neg),'r.');
 hold off;
 
-
 figure;
-plot(real(ifft(xs)),real(ifft(ys)),'r');
+for i = 1:length(k)
+
+subplot(1,2,1);
+plot(filt_xs,filt_ys,'b');
 hold on;
-jmp = 2;
-quiver(b1(1:jmp:end,2),b1(1:jmp:end,1),dx(1:jmp:end).*100,dy(1:jmp:end).*100);
-quiver(b1(1:jmp:end,2),b1(1:jmp:end,1),ddx(1:jmp:end).*100,ddy(1:jmp:end).*100,'c');
-plot(real(ifft(xs)),real(ifft(ys)),'r');
+plot(filt_xs(i),filt_ys(i),'ro');
 hold off;
 
-
-figure;
+subplot(1,2,2);
 plot(k);
 set(gca,'XLim',[1 length(k)]);
 title('Curvature');
 xlabel('Position along curve');
 ylabel('k');
+hold on;
+plot(i,k(i),'ro');
+hold off;
 
-% since curvature is not signed, assume when we get real close to zero,
-% that is a place where the curvature passes through zero in the signed
-% version.  this is a hack and should be fixed.
-pts = find(k < thresh);
+drawnow;
+end 
+
+%% since curvature is not signed, assume when we get real close to zero,
+%% that is a place where the curvature passes through zero in the signed
+%% version.  this is a hack and should be fixed.
+%pts = find(k < thresh);
+%dpts = diff(pts);
+%n = (length(find(abs(dpts) > 1))+1)/2;
+
+% signed curvature -> look for sign changes
+pts = sign(k);
 dpts = diff(pts);
-n = (length(find(abs(dpts) > 1))+1)/2;
+n = (length(find(abs(dpts) > 1)))/2;
