@@ -19,6 +19,6 @@ for i=1:5
     BW{i}(CC.PixelIdxList{idx}) = 1;
     B = bwboundaries(BW{i});
     bd{i} = B{1};    
-    subplot(2,3,i);plot(bd{i}(:,2),bd{i}(:,1));
+%    subplot(2,3,i);plot(bd{i}(:,2),bd{i}(:,1));
 end
 
