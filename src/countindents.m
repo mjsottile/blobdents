@@ -15,7 +15,9 @@
 % output: 
 %   - number of indentations
 %
-function n = countindents(im, filtsize, thresh)
+function [n, k, filt_xs, filt_ys] = countindents(im, filtsize, thresh)
+
+no_plotting = 1;
 
 % find the boundary of the shape as a sequence of x,y values
 [b,l] = bwboundaries(im,8);
@@ -45,8 +47,10 @@ ftddiff(nx:-1:nx-hx+1) = ftddiff(2:hx+1);
 % remove high frequency components with crude low pass filter.  high
 % frequency components are bad since they are sensitive to the
 % discretization of the curve around the shape.
-xs(filtsize:end-(filtsize-1)) = 0;
-ys(filtsize:end-(filtsize-1)) = 0;
+if filtsize > 0 
+    xs(filtsize:end-(filtsize-1)) = 0;
+    ys(filtsize:end-(filtsize-1)) = 0;
+end
 
 % compute the derivative and second derivative of the curve using the
 % fft-based derivative.
@@ -79,41 +83,42 @@ k = (ddy.*dx - ddx.*dy) ./ ((dx.^2 + dy.^2).^(3/2));
 % plot(real(ifft(xs)),real(ifft(ys)),'r');
 % hold off;
 
-
-figure;
-
 filt_xs = real(ifft(xs));
 filt_ys = real(ifft(ys));
 
-sk = sign(k);
-pos = find(sk==1);
-neg = find(sk==-1);
-plot(filt_xs(pos),filt_ys(pos),'b.');
-hold on;
-plot(filt_xs(neg),filt_ys(neg),'r.');
-hold off;
+if no_plotting ~= 1
+    figure;
 
-figure;
-for i = 1:length(k)
+    sk = sign(k);
+    pos = find(sk==1);
+    neg = find(sk==-1);
+    plot(filt_xs(pos),filt_ys(pos),'b.');
+    hold on;
+    plot(filt_xs(neg),filt_ys(neg),'r.');
+    hold off;
 
-subplot(1,2,1);
-plot(filt_xs,filt_ys,'b');
-hold on;
-plot(filt_xs(i),filt_ys(i),'ro');
-hold off;
+    figure;
+    for i = 1:length(k)
 
-subplot(1,2,2);
-plot(k);
-set(gca,'XLim',[1 length(k)]);
-title('Curvature');
-xlabel('Position along curve');
-ylabel('k');
-hold on;
-plot(i,k(i),'ro');
-hold off;
+    subplot(1,2,1);
+    plot(filt_xs,filt_ys,'b');
+    hold on;
+    plot(filt_xs(i),filt_ys(i),'ro');
+    hold off;
 
-drawnow;
-end 
+    subplot(1,2,2);
+    plot(k);
+    set(gca,'XLim',[1 length(k)]);
+    title('Curvature');
+    xlabel('Position along curve');
+    ylabel('k');
+    hold on;
+    plot(i,k(i),'ro');
+    hold off;
+
+    drawnow;
+    end 
+end
 
 %% since curvature is not signed, assume when we get real close to zero,
 %% that is a place where the curvature passes through zero in the signed
