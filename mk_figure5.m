@@ -26,13 +26,13 @@ for i=1:length(examples)
     [n, k, xs, ys, k_mask] = countindents(examples{i},50,0.001,[0;1],1);
     plot(xs,ys);
     hold on;
-    plot(xs(find(k_mask)),ys(find(k_mask)),'ro');
+    plot(xs(find(k_mask)),ys(find(k_mask)),'r+');
     hold off;
     set(gca,'XTick',[],'YTick',[]);
     title(sprintf('%d indentations',n));
 end
 
-set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 4 12]);
+set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 10 12]);
 saveas(gcf, 'figures/fig5.eps');
 saveas(gcf, 'figures/fig5.png');
 close all;
