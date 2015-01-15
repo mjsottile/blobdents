@@ -3,24 +3,52 @@
 % indentations in a lumpy binary image.
 %
 % matthew sottile / mjsottile@gmail.com
-% jan. 2013
+% jan. 2013-jan. 2015
 %
 %
 % input: 
-%   - bw image, 
+%   - bw image. 
 %   - filter size (e.g., 25 - how many Fourier components to 
-%     toss out for crude LPF).
-%   - threshold for curvature 0 crossing detection.  e.g., 0.001
+%     toss out for crude LPF).  -1 corresponds to no filtering.
+%   - sigma (severity) parameter
+%   - rho (relative size) parameter, 2 vector [rho_min, rho_max].
+%   - no_plotting flag
 %
 % output: 
 %   - number of indentations
+%   - curvature sequence
+%   - filtered x coordinates of boundary
+%   - filtered y coordinates of boundary
 %
-function [n, k, filt_xs, filt_ys] = countindents(im, filtsize, thresh)
+function [n, k, filt_xs, filt_ys, k_mask] = countindents(im, varargin)
 
+%% argument processing
+% process optional arguments
+num_vararg = length(varargin);
+
+% optional arguments get defaults
 no_plotting = 1;
+rho = [0.0,1.0];
+sigma = 0.001;
+filtsize = -1;
 
+% gross - there has to be a cleaner way to deal with this...
+if num_vararg >= 1
+    filtsize = varargin{1};
+end
+if num_vararg >= 2
+    sigma = varargin{2};
+end
+if num_vararg >= 3
+    rho = varargin{3};
+end
+if num_vararg >= 4
+    no_plotting = varargin{4};
+end
+
+%%
 % find the boundary of the shape as a sequence of x,y values
-[b,l] = bwboundaries(im,8);
+[b,~] = bwboundaries(im,8);
 
 % assume we only have one boundary
 b1 = b{1};
@@ -63,9 +91,7 @@ ddy = real(ifft(ys.*ftddiff'));
 %k = sqrt((ddy.*dx - ddx.*dy).^2) ./ ((dx.^2 + dy.^2).^(3/2));
 k = (ddy.*dx - ddx.*dy) ./ ((dx.^2 + dy.^2).^(3/2));
 
-%
-% plotting useful during debugging:
-% 
+%% plotting
 
 % figure;
 % plot(x,y,'r');
@@ -120,14 +146,31 @@ if no_plotting ~= 1
     end 
 end
 
-%% since curvature is not signed, assume when we get real close to zero,
-%% that is a place where the curvature passes through zero in the signed
-%% version.  this is a hack and should be fixed.
-%pts = find(k < thresh);
-%dpts = diff(pts);
-%n = (length(find(abs(dpts) > 1))+1)/2;
-
+%% apply rho and sigma, identify relevant regions
 % signed curvature -> look for sign changes
-pts = sign(k);
-dpts = diff(pts);
-n = (length(find(abs(dpts) > 1)))/2;
+k_signs = sign(k);
+k_signchanges = diff(k_signs);
+idx_changes = [1; find(k_signchanges); length(k_signchanges)];
+change_lengths = diff(idx_changes);
+
+%%% TODO: make sure to deal with boundary wrap around case correctly.
+
+n = 0;
+len_min = floor(length(k)*rho(1));
+len_max = ceil(length(k)*rho(2));
+
+k_mask = zeros(length(k),1);
+
+for i = 1:length(change_lengths)
+    % make sure the change is in the arc length range we care about
+    if (change_lengths(i) >= len_min) && (change_lengths(i) <= len_max)
+        ks = k(idx_changes(i):idx_changes(i+1));
+        k_mean = mean(ks);
+        k_max = max(abs(ks));
+        if k_mean < 0 && k_max > sigma
+            n = n + 1;
+            k_mask(idx_changes(i):idx_changes(i+1)) = 1;
+        end
+    end
+end
+

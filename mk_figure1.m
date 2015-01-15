@@ -29,12 +29,16 @@ title('Boundary of shape');
 % curvature plot
 subplot(1,2,2);
 plot(curvature);
-set(gca,'YLim',[-0.01, 0.01]);
+hold on;
+plot(1:length(curvature),zeros(length(curvature),1),'r--');
+hold off;
+set(gca,'YLim',[-0.01, 0.01],'XLim',[1,length(curvature)]);
 title('Curvature clockwise along boundary');
 xlabel('Boundary point index');
 ylabel('Signed curvature (\kappa)');
 drawnow;
 
 set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 12 6]);
+saveas(gcf, 'figures/fig1.eps');
 saveas(gcf, 'figures/fig1.png');
 close all;

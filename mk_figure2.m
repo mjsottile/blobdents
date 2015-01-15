@@ -32,6 +32,7 @@ set(gca,'XTick',[],'YTick',[]);
 
 set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 12 6]);
 saveas(gcf, 'figures/fig2.png');
+saveas(gcf, 'figures/fig2.eps');
 close all;
 
 figure;
@@ -46,4 +47,5 @@ set(gca,'YLim',[-0.05,0.05],'XLim',[1,length(curvature)]);
 
 set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 9 9]);
 saveas(gcf, 'figures/fig2_curvature.png');
+saveas(gcf, 'figures/fig2_curvature.eps');
 close all;

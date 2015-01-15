@@ -22,6 +22,7 @@ xlabel('X Position');
 ylabel('Y Position');
 title('Illustration of Gibbs phenomenon due to LPF');
 
-set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 9 9]);
+set(gcf, 'PaperUnits', 'Inches', 'PaperPosition', [0 0 9 5]);
 saveas(gcf, 'figures/fig3.png');
+saveas(gcf, 'figures/fig3.eps');
 close all;

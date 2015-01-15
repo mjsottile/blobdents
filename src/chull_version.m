@@ -1,5 +1,5 @@
 % code for blob dent counting using convex hull stuff
-function n = chull_version(im)
+function [fim, imhull, difference] = chull_version(im)
 
     % make sure no holes in image
     fim = imfill(im, 'holes');
@@ -10,11 +10,11 @@ function n = chull_version(im)
     % calculate difference
     difference = imhull - fim;
     
-    subplot(1,3,1);
-    imagesc(fim);
-    subplot(1,3,2);
-    imagesc(imhull);
-    subplot(1,3,3);
-    imagesc(difference);
+%    subplot(1,3,1);
+%    imagesc(fim);
+%    subplot(1,3,2);
+%    imagesc(imhull);
+%    subplot(1,3,3);
+%    imagesc(difference);
 
 end
