@@ -28,6 +28,8 @@ num_vararg = length(varargin);
 
 % optional arguments get defaults
 no_plotting = 1;
+% TODO: eliminate rho - it isn't used anymore.  for now, setting
+% to [0,1] makes it have no effect.
 rho = [0.0,1.0];
 sigma = 0.001;
 filtsize = -1;
